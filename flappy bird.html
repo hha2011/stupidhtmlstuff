@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: #70c5ce;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="flappyBirdCanvas"></canvas>
+    
+    <script>
+        const canvas = document.getElementById("flappyBirdCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const bird = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 20,
+            height: 20,
+            gravity: 0.6,
+            lift: -15,
+            velocity: 0,
+            draw: function() {
+                ctx.fillStyle = "yellow";
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            },
+            update: function() {
+                this.velocity += this.gravity;
+                this.velocity *= 0.9; // air resistance
+                this.y += this.velocity;
+
+                if (this.y > canvas.height - this.height) {
+                    this.y = canvas.height - this.height;
+                    this.velocity = 0;
+                }
+                if (this.y < 0) {
+                    this.y = 0;
+                    this.velocity = 0;
+                }
+            },
+            flap: function() {
+                this.velocity += this.lift;
+            }
+        };
+
+        class Pipe {
+            constructor() {
+                this.spacing = 150;
+                this.top = Math.random() * (canvas.height / 2);
+                this.bottom = canvas.height - (this.top + this.spacing);
+                this.x = canvas.width;
+                this.width = 20;
+                this.speed = 3;
+            }
+
+            draw() {
+                ctx.fillStyle = "green";
+                ctx.fillRect(this.x, 0, this.width, this.top);
+                ctx.fillRect(this.x, canvas.height - this.bottom, this.width, this.bottom);
+            }
+
+            update() {
+                this.x -= this.speed;
+            }
+
+            offscreen() {
+                return this.x < -this.width;
+            }
+
+            hits(bird) {
+                if (bird.y < this.top || bird.y > canvas.height - this.bottom) {
+                    if (bird.x > this.x && bird.x < this.x + this.width) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        let pipes = [];
+        let score = 0;
+        let gameOver = false;
+
+        function gameLoop() {
+            if (!gameOver) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                bird.update();
+                bird.draw();
+
+                if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width / 2) {
+                    pipes.push(new Pipe());
+                }
+
+                pipes.forEach((pipe, index) => {
+                    pipe.update();
+                    pipe.draw();
+
+                    if (pipe.hits(bird)) {
+                        gameOver = true;
+                    }
+
+                    if (pipe.offscreen()) {
+                        pipes.splice(index, 1);
+                        score++;
+                    }
+                });
+
+                ctx.fillStyle = "black";
+                ctx.font = "30px Arial";
+                ctx.fillText("Score: " + score, 10, 50);
+
+                requestAnimationFrame(gameLoop);
+            } else {
+                ctx.fillStyle = "red";
+                ctx.font = "50px Arial";
+                ctx.fillText("Game Over", canvas.width / 2 - 150, canvas.height / 2);
+            }
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "Space") {
+                bird.flap();
+            }
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>
