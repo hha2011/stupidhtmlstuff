@@ -8,15 +8,31 @@
         body {
             margin: 0;
             overflow: hidden;
+            font-family: Arial, sans-serif;
         }
         canvas {
             background-color: #70c5ce;
             display: block;
         }
+        #leaveButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #leaveButton:hover {
+            background-color: darkred;
+        }
     </style>
 </head>
 <body>
     <canvas id="flappyBirdCanvas"></canvas>
+    <button id="leaveButton">Leave</button>
     
     <script>
         const canvas = document.getElementById("flappyBirdCanvas");
@@ -135,6 +151,10 @@
             if (e.code === "Space") {
                 bird.flap();
             }
+        });
+
+        document.getElementById("leaveButton").addEventListener("click", function() {
+            window.location.href = "index.html"; // Redirect to index.html
         });
 
         gameLoop();
