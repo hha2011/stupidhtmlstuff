@@ -13,17 +13,20 @@
         canvas {
             background-color: #70c5ce;
             display: block;
+            width: 100vw;
+            height: 100vh;
         }
         #leaveButton {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            left: 10px;
             padding: 10px 20px;
             background-color: red;
             color: white;
             border: none;
             cursor: pointer;
             font-size: 16px;
+            z-index: 10;
         }
         #leaveButton:hover {
             background-color: darkred;
@@ -147,12 +150,19 @@
             }
         }
 
+        // Flap the bird when the screen is touched
+        window.addEventListener("touchstart", () => {
+            bird.flap();
+        });
+
+        // For keyboard users, keep spacebar functionality
         window.addEventListener("keydown", (e) => {
             if (e.code === "Space") {
                 bird.flap();
             }
         });
 
+        // Leave button event listener
         document.getElementById("leaveButton").addEventListener("click", function() {
             window.location.href = "index.html"; // Redirect to index.html
         });
